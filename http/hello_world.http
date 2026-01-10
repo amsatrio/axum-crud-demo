@@ -1,0 +1,41 @@
+@base_url=http://localhost:8003
+
+###
+GET {{base_url}}/hello-world
+###
+GET {{base_url}}/hello-world/response-body
+###
+GET {{base_url}}/hello-world/path/testparam
+###
+GET {{base_url}}/hello-world/query?name=testquery&age=12
+###
+POST {{base_url}}/hello-world/payload
+Content-Type: application/json
+
+{
+    "name": "test name",
+    "age": 12
+}
+###
+GET {{base_url}}/hello-world/logger
+Content-Type: application/json
+###
+GET {{base_url}}/hello-world/error?code=500
+Content-Type: application/json
+###
+POST {{base_url}}/hello-world/file/upload
+Content-Type: multipart/form-data; boundary="my_boundary"
+
+--my_boundary
+Content-Disposition: form-data; name="token"
+
+test token
+--my_boundary
+Content-Disposition: form-data; name="file"; filename="tes.jpg"
+Content-Type: image/jpeg
+
+< /home/mos/Pictures/tes.jpg
+--my_boundary--
+
+###
+GET {{base_url}}/hello-world/file/download?file_name=tes.jpg&file_path=data/image/2025/08/30/tes.jpg

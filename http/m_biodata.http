@@ -1,0 +1,41 @@
+@base_url=http://localhost:8003
+
+###
+GET {{base_url}}/m-biodata/list
+Content-Type: application/json
+###
+GET {{base_url}}/m-biodata/1001
+Content-Type: application/json
+
+
+###
+POST {{base_url}}/m-biodata
+Content-Type: application/json
+
+{
+    "id": 1001,
+    "fullname": "asas",
+    "mobile_phone": "08765433221",
+    "image": null,
+    "image_path": null,
+    "is_delete": false
+}
+###
+PUT {{base_url}}/m-biodata
+Content-Type: application/json
+
+{
+    "id": 1001,
+    "fullname": "asasasas",
+    "mobile_phone": "08765433221",
+    "image": null,
+    "image_path": null,
+    "is_delete": false
+}
+###
+DELETE {{base_url}}/m-biodata/1001
+Content-Type: application/json
+
+###
+GET {{base_url}}/m-biodata/pagination?page=0&size=5
+Content-Type: application/json
