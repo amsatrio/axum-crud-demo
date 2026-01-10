@@ -34,8 +34,8 @@ test token
 Content-Disposition: form-data; name="file"; filename="tes.jpg"
 Content-Type: image/jpeg
 
-< /home/mos/Pictures/tes.jpg
+< /home/user0/Pictures/tes.jpg
 --my_boundary--
 
 ###
-GET {{base_url}}/hello-world/file/download?file_name=tes.jpg&file_path=data/image/2025/08/30/tes.jpg
+GET {{base_url}}/hello-world/file/download?file_name=tes.jpg&file_path=data/image/2026/01/10/tes.jpg
