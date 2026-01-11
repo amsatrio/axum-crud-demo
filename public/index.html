@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quiz</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+
+<body class="bg-light">
+
+    <div class="container mt-5">
+        <div class="row justify-content-center">
+            <div class="col-md-6">
+
+                <div id="login-card" class="card shadow">
+                    <div class="card-header bg-dark text-white text-center">
+                        <h4 class="mb-0">Welcome to the Quiz</h4>
+                    </div>
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <label for="username" class="form-label">Enter Username to Start</label>
+                            <input type="text" id="username-input" class="form-control" placeholder="e.g. JohnDoe">
+                        </div>
+                        <button id="start-btn" class="btn btn-primary w-100" onclick="handleLogin()">Start Quiz</button>
+                    </div>
+                </div>
+
+                <div id="quiz-card" class="card shadow d-none">
+                    <div class="card-header bg-primary text-white">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <h4 class="mb-0">Knowledge Quiz</h4>
+                            <small id="user-display" class="badge bg-light text-dark"></small>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <h5 id="question" class="card-title mb-4 text-center">...</h5>
+                        <div id="options" class="d-grid gap-2"></div>
+                    </div>
+                    <div class="card-footer text-muted text-center" id="progress"></div>
+                </div>
+
+                <div id="result-card" class="card shadow d-none text-center">
+                    <div class="card-body">
+                        <h2 class="card-title">Quiz Complete!</h2>
+                        <p id="score-text" class="display-4 my-4"></p>
+                        <button class="btn btn-outline-primary" onclick="location.reload()">Play Again</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const BASE_URL = 'http://localhost:8003';
+        let quizData = [];
+        let currentQuestion = 0;
+        let score = 0;
+        let userId = null; // Store user ID from login
+
+        // --- LOGIN AND SAVE USER ---
+        async function handleLogin() {
+            const usernameInput = document.getElementById("username-input").value;
+            if (!usernameInput) return alert("Please enter a username!");
+
+            try {
+                const response = await fetch(`${BASE_URL}/quiz/create_new_user`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username: usernameInput })
+                });
+
+                const result = await response.json();
+
+                if (response.ok) {
+                    // Assuming API returns { data: { id: 1, username: "..." } }
+                    userId = Number(result.data.id);
+                    localStorage.setItem('quiz_user_id', userId);
+                    localStorage.setItem('quiz_username', usernameInput);
+
+                    document.getElementById("login-card").classList.add("d-none");
+                    document.getElementById("user-display").innerText = usernameInput;
+
+                    fetchQuizData();
+                } else {
+                    if (response.status === 400 && result.error === "resource exist") {
+                        alert("This username is already taken. Please pick another!");
+                        return;
+                    }
+                    alert("Connection error.");
+                }
+            } catch (error) {
+                console.error("Login Error:", error);
+                alert("Connection error.");
+            }
+        }
+
+        // --- FETCH QUESTIONS ---
+        async function fetchQuizData() {
+            try {
+                const response = await fetch(`${BASE_URL}/quiz/find_all_question`);
+                const json = await response.json();
+
+                // Map data and keep the internal IDs for the POST request later
+                quizData = json.data.map(item => ({
+                    id: item.id, // Question ID
+                    q: item.question,
+                    options: item.multiple_choice, // Array of {id, multiple_choice}
+                    correct: item.correct_index
+                }));
+
+                if (quizData.length > 0) {
+                    document.getElementById("quiz-card").classList.remove("d-none");
+                    loadQuestion();
+                }
+            } catch (error) {
+                console.error("Fetch Error:", error);
+            }
+        }
+
+        function loadQuestion() {
+            const qElement = document.getElementById("question");
+            const optElement = document.getElementById("options");
+            const progElement = document.getElementById("progress");
+
+            const currentData = quizData[currentQuestion];
+            optElement.innerHTML = "";
+            qElement.innerText = currentData.q;
+            progElement.innerText = `Question ${currentQuestion + 1} of ${quizData.length}`;
+
+            currentData.options.forEach((opt, index) => {
+                const btn = document.createElement("button");
+                btn.innerText = opt.multiple_choice;
+                btn.className = "btn btn-outline-secondary text-start p-3 mb-2 w-100";
+                // Pass the choice ID and the index to the click handler
+                btn.onclick = () => submitAnswer(opt.id, index);
+                optElement.appendChild(btn);
+            });
+        }
+
+        // --- NEW: SUBMIT ANSWER TO API ---
+        async function submitAnswer(choiceId, selectedIndex) {
+            const currentData = quizData[currentQuestion];
+
+            // 1. Hit the "Choose Answer" API
+            try {
+                await fetch(`${BASE_URL}/quiz/choose_answer`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        m_user_id: Number(userId),
+                        m_question_id: currentData.id,
+                        m_multiple_choice_id: choiceId
+                    })
+                });
+            } catch (error) {
+                console.error("Error saving answer:", error);
+            }
+
+            // 2. Update local score for immediate feedback
+            try {
+                const response = await fetch(`${BASE_URL}/quiz/result/${userId}`);
+                const result = await response.json();
+
+                if (response.ok && result.data) {
+                    score = result.data.correct_answer
+
+                } else {
+                    console.error("Error loading score.");
+                }
+            } catch (error) {
+                console.error("Score Fetch Error:", error);
+            }
+
+            // 3. Move to next question
+            currentQuestion++;
+            if (currentQuestion < quizData.length) {
+                loadQuestion();
+            } else {
+                showResult();
+            }
+        }
+
+        function showResult() {
+            document.getElementById("quiz-card").classList.add("d-none");
+            document.getElementById("result-card").classList.remove("d-none");
+            document.getElementById("score-text").innerText = `${score} / ${quizData.length}`;
+        }
+    </script>
+</body>
+
+</html>

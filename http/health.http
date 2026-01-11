@@ -1,3 +1,4 @@
-@base_url=http://localhost:8003
+# @base_url=http://localhost:8003
+@base_url=https://correct-mink-loved.ngrok-free.app
 ###
 GET {{base_url}}/health/status

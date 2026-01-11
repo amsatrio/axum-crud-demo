@@ -7,7 +7,7 @@ edition = "2024"
 axum = { version = "0.8.4", features = ["multipart"] }
 tokio = { version = "1.47.1", features = ["full"] }
 tower = { version = "0.5.2", features = ["timeout"] }
-tower-http = { version = "0.6.6", features = ["cors", "limit", "compression-full", "decompression-full"] }
+tower-http = { version = "0.6.6", features = ["fs", "cors", "limit", "compression-full", "decompression-full"] }
 
 validator = { version = "0.20.0", features = ["derive"] }
 

@@ -4,4 +4,4 @@ pub mod util;
 pub mod state;
 pub mod middleware;
 pub mod module;
-pub mod diesel_schema;
+pub mod schema;

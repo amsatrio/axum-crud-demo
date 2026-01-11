@@ -1,0 +1,49 @@
+@base_url=http://localhost:8003
+# @base_url=https://correct-mink-loved.ngrok-free.app
+
+### status
+GET {{base_url}}/quiz/status
+
+### find_all_question
+GET {{base_url}}/quiz/find_all_question
+
+### create_new_user
+POST {{base_url}}/quiz/create_new_user
+Content-Type: application/json
+
+{
+    "username": "abcaa"
+}
+### choose_answer
+POST {{base_url}}/quiz/choose_answer
+Content-Type: application/json
+
+{
+    "m_user_id": 1,
+    "m_question_id": 4,
+    "m_multiple_choice_id": 9
+}
+
+### result/{user_id}
+GET {{base_url}}/quiz/result/6
+
+### results
+GET {{base_url}}/quiz/results
+
+### status
+GET {{base_url}}/quiz/status
+
+
+### insert_question_answer
+POST {{base_url}}/quiz/insert_question_answer
+Content-Type: application/json
+
+{
+    "question": "Berapa presiden Indonesia saat ini?",
+    "multiple_choice": [
+      "Prabowo",
+      "Jokowi",
+      "1"
+    ],
+    "correct_answer": "1"
+  }

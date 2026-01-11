@@ -53,3 +53,7 @@ diesel_migration:
 ## print schema
 diesel_schema:
 	diesel print-schema > src/schema.rs
+
+
+ngrok:
+	ngrok http 8003 --url=https://correct-mink-loved.ngrok-free.app

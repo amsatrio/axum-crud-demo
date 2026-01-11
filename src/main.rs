@@ -6,12 +6,12 @@ use axum::{
     }, middleware::from_fn, Extension, Router
 };
 use axum_crud_demo::{
-    config::{self, environment::CONFIG, logger}, dto::environment::Environment, middleware::logger_middleware, module::{health, hello_world, m_biodata}, state::AppState
+    config::{self, environment::CONFIG, logger}, dto::environment::Environment, middleware::logger_middleware, module::{health, quiz}, state::AppState
 };
 // use diesel_async::pooled_connection::AsyncDieselConnectionManager;
 use tokio::{net::TcpListener, signal};
 use tower::ServiceBuilder;
-use tower_http::{compression::CompressionLayer, cors::CorsLayer, decompression::RequestDecompressionLayer};
+use tower_http::{compression::CompressionLayer, cors::CorsLayer, decompression::RequestDecompressionLayer, services::ServeDir};
 use tower_http::limit::RequestBodyLimitLayer;
 
 #[tokio::main]
@@ -39,12 +39,12 @@ async fn main() {
         .allow_methods([Method::GET, Method::POST, Method::PUT, Method::DELETE]);
 
     let api = Router::new()
-        .nest("/hello-world", hello_world::router::new())
         .nest("/health", health::router::new())
-        .nest("/m-biodata", m_biodata::router::new());
+        .nest("/quiz", quiz::router::new());
 
     let router = Router::new()
         .merge(api)
+        .nest_service("/public", ServeDir::new("public"))
         .layer(cors)
         // Disable the default limit
         .layer(DefaultBodyLimit::disable())

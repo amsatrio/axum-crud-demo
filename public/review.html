@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quiz Review</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .correct-bg { background-color: #d1e7dd; border-left: 5px solid #198754; }
+        .wrong-bg { background-color: #f8d7da; border-left: 5px solid #dc3545; }
+        .badge-choice { width: 30px; height: 30px; display: inline-flex; align-items: center; justify-content: center; border-radius: 50%; margin-right: 10px; font-weight: bold; }
+    </style>
+</head>
+<body class="bg-light">
+
+    <nav class="navbar navbar-dark bg-dark mb-4">
+        <div class="container">
+            <a class="navbar-brand" href="index.html">← Back to Quiz</a>
+            <span class="navbar-text">Answer Review</span>
+        </div>
+    </nav>
+
+    <div class="container pb-5">
+        <div class="row justify-content-center">
+            <div class="col-md-9">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h3>Reviewing Your Answers</h3>
+                    <div id="summary-stat" class="h5 text-muted"></div>
+                </div>
+
+                <div id="review-container">
+                    <div class="text-center py-5">
+                        <div class="spinner-border text-primary" role="status"></div>
+                        <p class="mt-2">Loading your review...</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const BASE_URL = 'http://localhost:8003';
+        const userId = localStorage.getItem('quiz_user_id');
+
+        async function loadReview() {
+            if (!userId) {
+                document.getElementById('review-container').innerHTML = `<div class="alert alert-warning">No user session found. Please play the quiz first.</div>`;
+                return;
+            }
+
+            try {
+                // 1. Get all questions
+                const qResponse = await fetch(`${BASE_URL}/quiz/find_all_question`);
+                const qData = await qResponse.json();
+
+                // 2. Get user's specific result/answers
+                // (Assuming your result API returns the choices made, or you have a specific /history endpoint)
+                const rResponse = await fetch(`${BASE_URL}/quiz/result/${userId}`);
+                const rData = await rResponse.json();
+
+                renderReview(qData.data, rData.data);
+            } catch (error) {
+                console.error("Review Load Error:", error);
+                document.getElementById('review-container').innerHTML = `<div class="alert alert-danger">Error loading review data.</div>`;
+            }
+        }
+
+        function renderReview(questions, results) {
+            const container = document.getElementById('review-container');
+            container.innerHTML = '';
+            
+            document.getElementById('summary-stat').innerText = `Score: ${results.correct_answer} / ${results.total_answered}`;
+
+            questions.forEach((q, index) => {
+                // Determine if correct (this logic depends on if your API returns the user's choice)
+                // For this UI, we are showing the question and highlighting the correct one.
+                const card = document.createElement('div');
+                card.className = 'card shadow-sm mb-4';
+                
+                let optionsHtml = '';
+                q.multiple_choice.forEach((opt, optIndex) => {
+                    const isCorrect = optIndex === q.correct_index;
+                    const itemClass = isCorrect ? 'list-group-item-success fw-bold' : '';
+                    const checkmark = isCorrect ? ' ✅ (Correct Answer)' : '';
+                    
+                    optionsHtml += `
+                        <li class="list-group-item ${itemClass}">
+                            <span class="badge bg-secondary badge-choice">${String.fromCharCode(65 + optIndex)}</span>
+                            ${opt.multiple_choice} ${checkmark}
+                        </li>
+                    `;
+                });
+
+                card.innerHTML = `
+                    <div class="card-header bg-white">
+                        <span class="text-muted">Question ${index + 1}</span>
+                        <h5 class="mt-2">${q.question}</h5>
+                    </div>
+                    <ul class="list-group list-group-flush">
+                        ${optionsHtml}
+                    </ul>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        loadReview();
+    </script>
+</body>
+</html>
