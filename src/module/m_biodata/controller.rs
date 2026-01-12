@@ -12,7 +12,9 @@ use crate::{
             filter_request::Filters, pagination_request::Pagination, search_request::Search,
             sort_request::Sorts,
         },
-        response::{app_error::AppError, app_response::AppResponse, pagination_response::PaginatedResponse},
+        response::{
+            app_error::AppError, app_response::AppResponse, pagination_response::PaginatedResponse,
+        },
     },
     module::m_biodata::{
         repository,
@@ -52,7 +54,8 @@ pub async fn find_by_id(
                     status: status_code.as_str().to_string(),
                     message: "success".to_owned(),
                     timestamp: chrono::Utc::now().naive_utc(),
-                    data: value,
+                    data: Some(value),
+                    error: None,
                 }),
             ));
         }
@@ -92,7 +95,8 @@ pub async fn find_all(
                     status: status_code.as_str().to_string(),
                     message: "success".to_owned(),
                     timestamp: chrono::Utc::now().naive_utc(),
-                    data: value,
+                    data: Some(value),
+                    error: None,
                 }),
             ));
         }
@@ -133,7 +137,8 @@ pub async fn delete_by_id(
                     status: status_code.as_str().to_string(),
                     message: "success".to_owned(),
                     timestamp: chrono::Utc::now().naive_utc(),
-                    data: String::new(),
+                    data: None,
+                    error: None,
                 }),
             ));
         }
@@ -194,7 +199,8 @@ pub async fn create(
                     status: status_code.as_str().to_string(),
                     message: "success".to_owned(),
                     timestamp: chrono::Utc::now().naive_utc(),
-                    data: String::new(),
+                    data: None,
+                    error: None,
                 }),
             ));
         }
@@ -258,7 +264,8 @@ pub async fn update(
                     status: status_code.as_str().to_string(),
                     message: "success".to_owned(),
                     timestamp: chrono::Utc::now().naive_utc(),
-                    data: String::new(),
+                    data: None,
+                    error: None,
                 }),
             ));
         }
@@ -331,14 +338,19 @@ pub async fn find_page(
             }
 
             let status_code = StatusCode::OK;
-            let paginated_response = PaginatedResponse { content: value.0, total_of_elements: value.1, total_of_pages: total_of_pages };
+            let paginated_response = PaginatedResponse {
+                content: value.0,
+                total_of_elements: value.1,
+                total_of_pages: total_of_pages,
+            };
             return Ok((
                 status_code,
                 Json(AppResponse {
                     status: status_code.as_str().to_string(),
                     message: "success".to_owned(),
                     timestamp: chrono::Utc::now().naive_utc(),
-                    data: paginated_response,
+                    data: Some(paginated_response),
+                    error: None,
                 }),
             ));
         }

@@ -13,7 +13,8 @@ pub async fn status(Extension(_state): Extension<Arc<AppState>>) -> Result<(Stat
             status: status_code.as_str().to_string(),
             message: "success".to_owned(),
             timestamp: chrono::Utc::now().naive_utc(),
-            data: "ok".to_string(),
+            data: Some("ok".to_string()),
+            error: None
         }),
     ))
 }

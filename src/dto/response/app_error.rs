@@ -7,7 +7,7 @@ use axum::{
 };
 use validator::ValidationErrors;
 
-use crate::dto::response::app_response::AppResponseError;
+use crate::dto::response::app_response::AppResponse;
 
 #[derive(Debug)]
 pub enum AppError {
@@ -25,11 +25,12 @@ impl IntoResponse for AppError {
                 let status_code = StatusCode::BAD_REQUEST;
                 (
                     status_code,
-                    Json(AppResponseError {
+                    Json(AppResponse {
                         status: status_code.as_str().to_string(),
                         message: "error".to_owned(),
                         timestamp: chrono::Utc::now().naive_utc(),
-                        error: "resource exist".to_string(),
+                        error: Some("resource exist".to_string()),
+                        data: None,
                     }),
                 )
                     .into_response()
@@ -38,11 +39,12 @@ impl IntoResponse for AppError {
                 let status_code = StatusCode::NOT_FOUND;
                 (
                     status_code,
-                    Json(AppResponseError {
+                    Json(AppResponse {
                         status: status_code.as_str().to_string(),
                         message: "error".to_owned(),
                         timestamp: chrono::Utc::now().naive_utc(),
-                        error: "resource not found".to_string(),
+                        error: Some("resource not found".to_string()),
+                        data: None,
                     }),
                 )
                     .into_response()
@@ -51,11 +53,12 @@ impl IntoResponse for AppError {
                 let status_code = StatusCode::INTERNAL_SERVER_ERROR;
                 (
                     status_code,
-                    Json(AppResponseError {
+                    Json(AppResponse {
                         status: status_code.as_str().to_string(),
                         message: "error".to_owned(),
                         timestamp: chrono::Utc::now().naive_utc(),
-                        error: "internal server error".to_string(),
+                        error: Some("internal server error".to_string()),
+                        data: None,
                     }),
                 )
                     .into_response()
@@ -64,11 +67,12 @@ impl IntoResponse for AppError {
                 let status_code = StatusCode::INTERNAL_SERVER_ERROR;
                 (
                     status_code,
-                    Json(AppResponseError {
+                    Json(AppResponse {
                         status: status_code.as_str().to_string(),
                         message: "error".to_owned(),
                         timestamp: chrono::Utc::now().naive_utc(),
-                        error: message,
+                        error: Some(message),
+                        data: None,
                     }),
                 )
                     .into_response()
@@ -77,11 +81,14 @@ impl IntoResponse for AppError {
                 let status_code = StatusCode::BAD_REQUEST;
                 (
                     status_code,
-                    Json(AppResponseError {
+                    Json(AppResponse {
                         status: status_code.as_str().to_string(),
                         message: "error".to_owned(),
                         timestamp: chrono::Utc::now().naive_utc(),
-                        error: parse_validation_error_message(&format!("{validation_errors}"))
+                        error: Some(parse_validation_error_message(&format!(
+                            "{validation_errors}"
+                        ))),
+                        data: None,
                     }),
                 )
                     .into_response()

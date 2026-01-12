@@ -31,7 +31,8 @@ pub async fn response_body() -> (StatusCode, Json<AppResponse<String>>) {
             status: status_code.as_str().to_string(),
             message: "success".to_owned(),
             timestamp: chrono::Utc::now().naive_utc(),
-            data: "some data".to_string(),
+            data: Some("some data".to_string()),
+            error: None,
         }),
     )
 }
@@ -44,7 +45,8 @@ pub async fn path_param(Path(name): Path<String>) -> (StatusCode, Json<AppRespon
             status: status_code.as_str().to_string(),
             message: "success".to_owned(),
             timestamp: chrono::Utc::now().naive_utc(),
-            data: name,
+            data: Some(name),
+            error: None,
         }),
     )
 }
@@ -57,7 +59,8 @@ pub async fn query_param(Query(param): Query<Params>) -> (StatusCode, Json<AppRe
             status: status_code.as_str().to_string(),
             message: "success".to_owned(),
             timestamp: chrono::Utc::now().naive_utc(),
-            data: param,
+            data: Some(param),
+            error: None,
         }),
     )
 }
@@ -70,7 +73,8 @@ pub async fn payload(Json(payload): Json<Payloads>) -> (StatusCode, Json<AppResp
             status: status_code.as_str().to_string(),
             message: "success".to_owned(),
             timestamp: chrono::Utc::now().naive_utc(),
-            data: payload,
+            data: Some(payload),
+            error: None,
         }),
     )
 }
@@ -84,7 +88,8 @@ pub async fn logger() -> (StatusCode, Json<AppResponse<String>>) {
             status: status_code.as_str().to_string(),
             message: "success".to_owned(),
             timestamp: chrono::Utc::now().naive_utc(),
-            data: "".to_string(),
+            data: None,
+            error: None,
         }),
     )
 }
@@ -105,7 +110,8 @@ pub async fn error(
             status: status_code.as_str().to_string(),
             message: "success".to_owned(),
             timestamp: chrono::Utc::now().naive_utc(),
-            data: "".to_string(),
+            data: None,
+            error: None,
         }),
     ))
 }
@@ -209,7 +215,8 @@ pub async fn upload(
             status: status_code.as_str().to_string(),
             message: "success".to_owned(),
             timestamp: chrono::Utc::now().naive_utc(),
-            data: "".to_string(),
+            data: None,
+            error: None,
         }),
     ))
 }
@@ -228,7 +235,8 @@ pub async fn download(param_file: Query<ParamsFile>) -> impl IntoResponse {
                         status: StatusCode::INTERNAL_SERVER_ERROR.as_str().to_string(),
                         message: "error".to_owned(),
                         timestamp: chrono::Utc::now().naive_utc(),
-                        data: "failed to read the file".to_string(),
+                        error: Some("failed to read the file".to_string()),
+                        data: None
                     }),
                 )
                     .into_response();
@@ -251,7 +259,8 @@ pub async fn download(param_file: Query<ParamsFile>) -> impl IntoResponse {
                 status: StatusCode::NOT_FOUND.as_str().to_string(),
                 message: "error".to_owned(),
                 timestamp: chrono::Utc::now().naive_utc(),
-                data: "file not found".to_string(),
+                error: Some(String::from("file not found")),
+                data: None,
             }),
         )
             .into_response()),

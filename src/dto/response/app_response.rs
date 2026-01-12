@@ -1,4 +1,3 @@
-
 use chrono::NaiveDateTime;
 use serde::{Deserialize, Serialize};
 
@@ -10,14 +9,8 @@ pub struct AppResponse<T> {
     pub message: String,
     #[serde(with = "date_serializer")]
     pub timestamp: NaiveDateTime,
-    pub data: T,
-}
-
-#[derive(Debug, Deserialize, Serialize, PartialEq)]
-pub struct AppResponseError<T> {
-    pub status: String,
-    pub message: String,
-    #[serde(with = "date_serializer")]
-    pub timestamp: NaiveDateTime,
-    pub error: T,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub data: Option<T>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub error: Option<T>,
 }

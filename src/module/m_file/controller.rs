@@ -59,7 +59,8 @@ pub async fn find_by_id(
                     status: status_code.as_str().to_string(),
                     message: "success".to_owned(),
                     timestamp: chrono::Utc::now().naive_utc(),
-                    data: value,
+                    data: Some(value),
+                    error: None,
                 }),
             ));
         }
@@ -99,7 +100,8 @@ pub async fn find_all(
                     status: status_code.as_str().to_string(),
                     message: "success".to_owned(),
                     timestamp: chrono::Utc::now().naive_utc(),
-                    data: value,
+                    data: Some(value),
+                    error: None,
                 }),
             ));
         }
@@ -137,7 +139,8 @@ pub async fn delete_by_id(
                     status: status_code.as_str().to_string(),
                     message: "success".to_owned(),
                     timestamp: chrono::Utc::now().naive_utc(),
-                    data: String::new(),
+                    data: None,
+                    error: None,
                 }),
             ));
         }
@@ -198,7 +201,8 @@ pub async fn create(
                     status: status_code.as_str().to_string(),
                     message: "success".to_owned(),
                     timestamp: chrono::Utc::now().naive_utc(),
-                    data: String::new(),
+                    data: None,
+                    error: None,
                 }),
             ));
         }
@@ -261,7 +265,8 @@ pub async fn update(
                     status: status_code.as_str().to_string(),
                     message: "success".to_owned(),
                     timestamp: chrono::Utc::now().naive_utc(),
-                    data: String::new(),
+                    data: None,
+                    error: None,
                 }),
             ));
         }
@@ -345,7 +350,8 @@ pub async fn find_page(
                     status: status_code.as_str().to_string(),
                     message: "success".to_owned(),
                     timestamp: chrono::Utc::now().naive_utc(),
-                    data: paginated_response,
+                    data: Some(paginated_response),
+                    error: None,
                 }),
             ));
         }
@@ -458,10 +464,10 @@ pub async fn upload(
     let result = repository::insert_mfile(&mut db_conn, new_m_file.clone());
 
     match result {
-        Ok(_) => {},
+        Ok(_) => {}
         Err(value) => {
             return Err(value);
-        },
+        }
     };
 
     let status_code = StatusCode::OK;
@@ -471,7 +477,8 @@ pub async fn upload(
             status: status_code.as_str().to_string(),
             message: "success".to_owned(),
             timestamp: chrono::Utc::now().naive_utc(),
-            data: new_m_file,
+            data: Some(new_m_file),
+            error: None,
         }),
     ))
 }
