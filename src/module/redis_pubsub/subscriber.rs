@@ -4,14 +4,14 @@ use std::sync::Arc;
 use axum::{Extension, Json, http::StatusCode};
 
 use crate::{
-    dto::response::{app_error::AppError, app_response::AppResponse},
-    state::AppState,
+    config::environment::CONFIG, dto::response::{app_error::AppError, app_response::AppResponse}, state::AppState
 };
 
 pub async fn subscribe(
     Extension(_state): Extension<Arc<AppState>>,
 ) -> Result<(StatusCode, Json<AppResponse<String>>), AppError> {
-    let client = redis::Client::open("redis://:8cffbaaa5bd144ab1939361a03103eed7d1af6fd9e2052b1ef73502745a3dfcc@127.0.0.1:6379/")
+    let config_env = &CONFIG;
+    let client = redis::Client::open(format!("redis://:{}@{}:{}/", config_env.redis_password, config_env.redis_host, config_env.redis_port))
         .map_err(|error| AppError::Other(format!("open redis failed: {}", error)))?;
     let mut pubsub_conn = client
         .get_async_pubsub()
