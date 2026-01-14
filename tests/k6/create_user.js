@@ -7,11 +7,11 @@ export const options = {
     spike_test: {
       executor: 'ramping-arrival-rate',
       preAllocatedVUs: 100, // Increased to handle the spike
-      maxVUs: 500,          // Upper limit of VUs k6 can scale to
+      maxVUs: 10000,          // Upper limit of VUs k6 can scale to
       timeUnit: '1s',
       startRate: 10,
       stages: [
-        { target: 10, duration: '1m' },   // 1. Warm up at low traffic
+        { target: 10, duration: '30' },   // 1. Warm up at low traffic
         { target: 1000, duration: '10s' }, // 2. SPIKE: Jump to 1000 iterations/sec
         { target: 1000, duration: '30s' }, // 3. Hold the spike
         { target: 10, duration: '10s' },  // 4. Scale down quickly
@@ -42,5 +42,5 @@ export default function () {
   });
 
   // Short sleep to prevent tight-looping within the arrival rate
-  sleep(0.1);
+//   sleep(0.1);
 }
