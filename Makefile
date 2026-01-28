@@ -27,7 +27,7 @@ clean:
 build_release:
 	cargo build --release &> logs/build_release.log
 build_release_start: build_release
-	/home/mos/drive_0/workspace/rust/actix_crud/target/release/actix_crud
+	./target/release/axum-crud-demo
 	
 
 # test section
