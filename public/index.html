@@ -21,7 +21,8 @@
                     <div class="card-body">
                         <div class="mb-3">
                             <label for="username" class="form-label">Enter Username to Start</label>
-                            <input type="text" id="username-input" class="form-control" placeholder="e.g. JohnDoe">
+                            <input type="text" id="username-input" class="form-control"
+                                placeholder="e.g. abc123 (no spaces or symbols)">
                         </div>
                         <button id="start-btn" class="btn btn-primary w-100" onclick="handleLogin()">Start Quiz</button>
                     </div>
@@ -63,6 +64,12 @@
         async function handleLogin() {
             const usernameInput = document.getElementById("username-input").value;
             if (!usernameInput) return alert("Please enter a username!");
+
+            const alphanumericRegex = /^[a-zA-Z0-9]+$/;
+
+            if (!alphanumericRegex.test(usernameInput)) {
+                return alert("Username must only contain letters and numbers (no spaces or symbols)!");
+            }
 
             try {
                 const response = await fetch(`${BASE_URL}/quiz/create_new_user`, {

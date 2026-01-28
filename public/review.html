@@ -50,7 +50,7 @@
 
             try {
                 // 1. Get all questions
-                const qResponse = await fetch(`${BASE_URL}/quiz/find_all_question`);
+                const qResponse = await fetch(`${BASE_URL}/quiz/find_all_question_and_answer`);
                 const qData = await qResponse.json();
 
                 // 2. Get user's specific result/answers
@@ -79,9 +79,10 @@
                 
                 let optionsHtml = '';
                 q.multiple_choice.forEach((opt, optIndex) => {
-                    const isCorrect = optIndex === q.correct_index;
+    
+                    const isCorrect = opt.id === q.correct_answer.multiple_choice_id;
                     const itemClass = isCorrect ? 'list-group-item-success fw-bold' : '';
-                    const checkmark = isCorrect ? ' ✅ (Correct Answer)' : '';
+                    const checkmark = isCorrect ? ' ✅' : '';
                     
                     optionsHtml += `
                         <li class="list-group-item ${itemClass}">
