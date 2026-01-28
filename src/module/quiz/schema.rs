@@ -82,6 +82,7 @@ pub struct MQuestionResponse {
     pub id: Option<i64>,
     pub question: Option<String>,
     pub multiple_choice: Vec<MMultipleChoice>,
+    pub correct_answer: Option<MAnswer>
 }
 
 

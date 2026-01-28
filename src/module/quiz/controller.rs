@@ -136,6 +136,57 @@ pub async fn find_all_question(
             id: Some(data_question.id.unwrap()),
             question: data_question.question,
             multiple_choice: multiple_choice_list,
+            correct_answer: None
+        };
+        data.push(m_question_response);
+    }
+    let status_code = StatusCode::OK;
+    return Ok((
+        status_code,
+        Json(AppResponse {
+            status: status_code.as_str().to_string(),
+            message: "success".to_owned(),
+            timestamp: chrono::Utc::now().naive_utc(),
+            data: data,
+        }),
+    ));
+}
+
+pub async fn find_all_question_and_answer(
+    Extension(_state): Extension<Arc<AppState>>,
+) -> Result<(StatusCode, Json<AppResponse<Vec<MQuestionResponse>>>), AppError> {
+    log::info!("status: {}", _state.status);
+
+    // get db connection
+    let db_conn_result = _state.diesel_pool_mysql.get();
+    let mut db_conn;
+    match db_conn_result {
+        Ok(value) => {
+            db_conn = value;
+        }
+        Err(error) => {
+            return Err(AppError::Other(format!("get connection failed {error}")).into());
+        }
+    };
+
+    let result_question = repository::find_all_question(&mut db_conn).unwrap();
+    let result_multiple_choice = repository::find_all_multiple_choice(&mut db_conn).unwrap();
+
+    let mut data: Vec<MQuestionResponse> = Vec::new();
+    for data_question in result_question {
+        let mut multiple_choice_list: Vec<MMultipleChoice> = Vec::new();
+        for data_multiple_choice in result_multiple_choice.clone() {
+            if data_multiple_choice.m_question_id.unwrap() == data_question.id.unwrap() {
+                multiple_choice_list.push(data_multiple_choice);
+            }
+        }
+        let result_answer = repository::find_answer_by_question_id(&mut db_conn, data_question.id.unwrap()).unwrap();
+
+        let m_question_response: MQuestionResponse = MQuestionResponse {
+            id: Some(data_question.id.unwrap()),
+            question: data_question.question,
+            multiple_choice: multiple_choice_list,
+            correct_answer: result_answer.get(0).cloned(),
         };
         data.push(m_question_response);
     }
