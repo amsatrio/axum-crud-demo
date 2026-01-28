@@ -6,6 +6,8 @@ GET {{base_url}}/quiz/status
 
 ### find_all_question
 GET {{base_url}}/quiz/find_all_question
+### find_all_question_and_answer
+GET {{base_url}}/quiz/find_all_question_and_answer
 
 ### create_new_user
 POST {{base_url}}/quiz/create_new_user
